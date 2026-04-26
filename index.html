@@ -88,10 +88,11 @@ let days = Math.floor(diff/(1000*60*60*24));
 
 let result = document.getElementById("result");
 
-if(days === 0){
+// TEMPORARY TEST MODE (always show birthday)
+if(true){
   result.innerHTML="🎉 Happy Birthday Ahana! 🎂";
   document.getElementById("song").play();
-  startConfetti();
+  confetti();
 }else{
   result.innerHTML = `💖 ${days} day${days>1?"s":""} left for Ahana's birthday (9 May)`;
 }
