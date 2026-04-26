@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Countdown</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
+      color: #333;
+      padding: 50px;
+    }
+    h1 { font-size: 2.5rem; }
+    input, button {
+      padding: 10px;
+      font-size: 1rem;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background-color: #ff6f61;
+      color: white;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>  <h1>🎉 Birthday Countdown 🎂</h1>  <p>Enter name:</p>
+  <input type="text" id="name" placeholder="Enter name (e.g., Ahana)">  <p>Select birthday:</p>
+  <input type="date" id="birthday">
+  <br>
+  <button onclick="calculateCountdown()">Check Countdown</button>  <div id="result"></div>  <script>
+    function calculateCountdown() {
+      const name = document.getElementById('name').value || 'Friend';
+      const input = document.getElementById('birthday').value;
+      const result = document.getElementById('result');
+
+      if (!input) {
+        result.innerHTML = "Please select your birthday!";
+        return;
+      }
+
+      const today = new Date();
+      const birthDate = new Date(input);
+
+      let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+
+      if (nextBirthday < today) {
+        nextBirthday.setFullYear(today.getFullYear() + 1);
+      }
+
+      const diffTime = nextBirthday - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        result.innerHTML = 🎉 Happy Birthday ${name}! 🎂;
+      } else {
+        result.innerHTML = 🎈 ${diffDays} day(s) left until ${name}'s birthday!;
+      }
+    }
+  </script></body>
+</html>
