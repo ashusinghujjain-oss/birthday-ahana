@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birthday Countdown</title>
+  <title>Ahana Birthday Countdown</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,58 +10,126 @@
       background: linear-gradient(to right, #ff9a9e, #fad0c4);
       color: #333;
       padding: 50px;
+      overflow: hidden;
     }
     h1 { font-size: 2.5rem; }
-    input, button {
-      padding: 10px;
+    button {
+      padding: 10px 20px;
       font-size: 1rem;
-      margin: 10px;
+      margin-top: 20px;
       border-radius: 8px;
       border: none;
-    }
-    button {
       background-color: #ff6f61;
       color: white;
       cursor: pointer;
     }
     #result {
       margin-top: 20px;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: bold;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
     }
   </style>
 </head>
-<body>  <h1>🎉 Birthday Countdown 🎂</h1>  <p>Enter name:</p>
-  <input type="text" id="name" placeholder="Enter name (e.g., Ahana)">  <p>Select birthday:</p>
-  <input type="date" id="birthday">
-  <br>
-  <button onclick="calculateCountdown()">Check Countdown</button>  <div id="result"></div>  <script>
+<body>  <h1>🎉 Countdown for Ahana 🎂</h1><button onclick="calculateCountdown()">See Surprise 💖</button>
+
+  <div id="result"></div><audio id="birthdaySong" src="https://www2.cs.uic.edu/~i101/SoundFiles/HappyBirthday.wav"></audio>
+
+<canvas id="confettiCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+
+    function createConfetti() {
+      confetti = [];
+      for (let i = 0; i < 150; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 6 + 2,
+          d: Math.random() * 10 + 2
+        });
+      }
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath();
+      for (let i = 0; i < confetti.length; i++) {
+        let c = confetti[i];
+        ctx.moveTo(c.x, c.y);
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2, true);
+      }
+      ctx.fill();
+      updateConfetti();
+    }
+
+    function updateConfetti() {
+      for (let i = 0; i < confetti.length; i++) {
+        let c = confetti[i];
+        c.y += Math.cos(c.d) + 1;
+        c.x += Math.sin(c.d);
+
+        if (c.y > canvas.height) {
+          c.y = 0;
+          c.x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    function startConfetti() {
+      createConfetti();
+      setInterval(drawConfetti, 20);
+    }
+
     function calculateCountdown() {
-      const name = document.getElementById('name').value || 'Friend';
-      const input = document.getElementById('birthday').value;
       const result = document.getElementById('result');
 
-      if (!input) {
-        result.innerHTML = "Please select your birthday!";
-        return;
-      }
-
       const today = new Date();
-      const birthDate = new Date(input);
+      today.setHours(0,0,0,0); // normalize to avoid time issues
 
-      let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+      const year = today.getFullYear();
+
+      // Fixed birthday: May 9
+      let nextBirthday = new Date(year, 4, 9);
+      nextBirthday.setHours(0,0,0,0);
 
       if (nextBirthday < today) {
-        nextBirthday.setFullYear(today.getFullYear() + 1);
+        nextBirthday.setFullYear(year + 1);
       }
+
+      const diffTime = nextBirthday - today;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        result.innerHTML = "🎉 Happy Birthday Ahana! 🎂";
+        document.getElementById('birthdaySong').play();
+        startConfetti();
+      } else {
+        result.innerHTML = 💖 ${diffDays} day${diffDays > 1 ? 's' : ''} left for Ahana's birthday (9 May);
+      }
+    }
 
       const diffTime = nextBirthday - today;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays === 0) {
-        result.innerHTML = 🎉 Happy Birthday ${name}! 🎂;
+        result.innerHTML = "🎉 Happy Birthday Ahana! 🎂";
+        document.getElementById('birthdaySong').play();
+        startConfetti();
       } else {
-        result.innerHTML = 🎈 ${diffDays} day(s) left until ${name}'s birthday!;
+        result.innerHTML = 💖 ${diffDays} days left for Ahana's birthday (9 May);
       }
     }
   </script></body>
