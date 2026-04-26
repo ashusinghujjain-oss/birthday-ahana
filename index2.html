@@ -1,0 +1,101 @@
+<!DOCTYPE html><html>
+<head>
+<title>Ahana Birthday</title>
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: linear-gradient(to right,#ff9a9e,#fad0c4);
+  padding: 50px;
+  overflow:hidden;
+}
+button {
+  padding: 12px;
+  font-size: 16px;
+  background:#ff6f61;
+  color:white;
+  border:none;
+  border-radius:8px;
+}
+#result {
+  margin-top:20px;
+  font-size:22px;
+  font-weight:bold;
+}
+canvas{
+ position:fixed;
+ top:0;
+ left:0;
+ pointer-events:none;
+}
+</style>
+</head><body><h1>🎉 For Ahana 💖</h1><button onclick="show()">See Surprise</button>
+
+<div id="result"></div><audio id="song" src="https://www2.cs.uic.edu/~i101/SoundFiles/HappyBirthday.wav"></audio>
+
+<canvas id="confetti"></canvas>
+
+<script>
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let pieces = [];
+
+function startConfetti(){
+  pieces = [];
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*6+2
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="white";
+    pieces.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fill();
+      p.y+=2;
+      if(p.y>canvas.height) p.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+function show() {
+
+let today = new Date();
+today.setHours(0,0,0,0);
+
+let year = today.getFullYear();
+
+let bday = new Date(year,4,9);
+bday.setHours(0,0,0,0);
+
+if (bday < today) {
+  bday.setFullYear(year+1);
+}
+
+let diff = bday - today;
+let days = Math.floor(diff/(1000*60*60*24));
+
+let result = document.getElementById("result");
+
+if(days === 0){
+  result.innerHTML="🎉 Happy Birthday Ahana! 🎂";
+  document.getElementById("song").play();
+  startConfetti();
+}else{
+  result.innerHTML = `💖 ${days} day${days>1?"s":""} left for Ahana's birthday (9 May)`;
+}
+
+}
+</script></body>
+</html>
