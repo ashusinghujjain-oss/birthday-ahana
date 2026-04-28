@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahana's Special Day 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose:    #f43f6e;
+    --blush:   #fda4af;
+    --cream:   #fff1f2;
+    --gold:    #f59e0b;
+    --deep:    #881337;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 20% 10%, #fce7f3 0%, #fff1f2 40%, #fce7f3 100%);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── floating petals bg ── */
+  .petal-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  }
+
+  /* ── COUNTDOWN VIEW ── */
+  #countdown-view {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 40px 24px;
+    animation: fadeIn .8s ease both;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--rose);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+
+  h1.title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 10vw, 88px);
+    color: var(--deep);
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+
+  h1.title span { color: var(--rose); font-style: italic; }
+
+  .subtitle {
+    font-size: 16px;
+    color: #9f1239;
+    letter-spacing: 1px;
+    margin-bottom: 52px;
+    opacity: .7;
+  }
+
+  /* countdown boxes */
+  .boxes {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+
+  .box {
+    background: #fff;
+    border: 2px solid var(--blush);
+    border-radius: 20px;
+    width: 110px;
+    padding: 20px 10px 14px;
+    box-shadow: 0 8px 32px rgba(244,63,110,.12);
+    transition: transform .3s;
+  }
+  .box:hover { transform: translateY(-4px); }
+
+  .box .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    color: var(--rose);
+    line-height: 1;
+    display: block;
+  }
+
+  .box .lbl {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #be123c;
+    opacity: .6;
+    display: block;
+    margin-top: 6px;
+  }
+
+  .until-msg {
+    font-size: 18px;
+    color: var(--deep);
+    margin-bottom: 12px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+  }
+
+  .heart-divider { color: var(--rose); font-size: 22px; letter-spacing: 6px; margin-bottom: 12px; }
+
+  /* ── BIRTHDAY VIEW ── */
+  #birthday-view {
+    display: none;
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 40px 24px;
+    animation: fadeIn 1s ease both;
+  }
+
+  .bday-tag {
+    display: inline-block;
+    background: var(--gold);
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+
+  h1.bday-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 9vw, 80px);
+    color: var(--deep);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  h1.bday-title em { color: var(--rose); font-style: italic; }
+
+  .bday-sub {
+    font-size: 17px;
+    color: #9f1239;
+    margin-bottom: 40px;
+    line-height: 1.6;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .music-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(244,63,110,.35);
+    transition: transform .2s, box-shadow .2s;
+    letter-spacing: .5px;
+  }
+
+  .music-btn:hover { transform: scale(1.05); box-shadow: 0 12px 32px rgba(244,63,110,.45); }
+  .music-btn:active { transform: scale(.98); }
+
+  /* ── confetti canvas ── */
+  #confetti-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* ── petals ── */
+  .petal {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50% 0 50% 0;
+    opacity: .35;
+    animation: floatPetal linear infinite;
+  }
+
+  @keyframes floatPetal {
+    0%   { transform: translateY(-60px) rotate(0deg);   opacity: .35; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0;   }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.08); }
+  }
+
+  .pulse { animation: pulse 1.6s ease infinite; }
+
+  /* responsive */
+  @media (max-width: 480px) {
+    .box { width: 80px; padding: 14px 6px 10px; }
+    .box .num { font-size: 38px; }
+    .boxes { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div class="petal-bg" id="petal-bg"></div>
+
+<!-- COUNTDOWN -->
+<div id="countdown-view">
+  <div class="tag">✨ Something Special Is Coming</div>
+  <h1 class="title"><span>Ahana's</span><br>Birthday</h1>
+  <p class="subtitle">— 9 May —</p>
+
+  <div class="boxes">
+    <div class="box">
+      <span class="num" id="days">00</span>
+      <span class="lbl">Days</span>
+    </div>
+    <div class="box">
+      <span class="num" id="hours">00</span>
+      <span class="lbl">Hours</span>
+    </div>
+    <div class="box">
+      <span class="num" id="mins">00</span>
+      <span class="lbl">Mins</span>
+    </div>
+    <div class="box">
+      <span class="num" id="secs">00</span>
+      <span class="lbl">Secs</span>
+    </div>
+  </div>
+
+  <div class="heart-divider">✦ ✦ ✦</div>
+  <p class="until-msg">Can't wait to celebrate you 🎂</p>
+</div>
+
+<!-- BIRTHDAY -->
+<div id="birthday-view">
+  <div class="bday-tag">🎉 9 May — Your Day!</div>
+  <h1 class="bday-title">Happy Birthday,<br><em>Ahana!</em> 🎂</h1>
+  <p class="bday-sub">
+    May your day be filled with love, laughter,<br>
+    and everything that makes your day shine ✨
+  </p>
+  <button class="music-btn pulse" id="music-btn" onclick="playMusic()">
+    🎵 Play Birthday Song
+  </button>
+</div>
+
+<!-- hidden audio — uses a free public domain birthday tune -->
+<audio id="bday-audio" loop>
+  <!-- We'll generate tones via Web Audio API as a fallback -->
+</audio>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const BIRTHDAY_MONTH = 5;   // May  (JS months: Jan=1 … Dec=12 in our logic)
+const BIRTHDAY_DAY   = 9;
+
+// ── DETERMINE VIEW ──────────────────────────────────────────────────────────
+function isBirthday() {
+  const now = new Date();
+  return now.getMonth() + 1 === BIRTHDAY_MONTH && now.getDate() === BIRTHDAY_DAY;
+}
+
+function getNextBirthday() {
+  const now  = new Date();
+  const year = now.getFullYear();
+  let bday   = new Date(year, BIRTHDAY_MONTH - 1, BIRTHDAY_DAY, 0, 0, 0);
+  if (now >= bday) bday = new Date(year + 1, BIRTHDAY_MONTH - 1, BIRTHDAY_DAY, 0, 0, 0);
+  return bday;
+}
+
+// ── COUNTDOWN ────────────────────────────────────────────────────────────────
+function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
+
+function updateCountdown() {
+  const now  = new Date();
+  const diff = getNextBirthday() - now;
+
+  if (diff <= 0) { switchToBirthday(); return; }
+
+  const days  = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins  = Math.floor((diff % 3600000)  / 60000);
+  const secs  = Math.floor((diff % 60000)    / 1000);
+
+  document.getElementById('days').textContent  = pad(days);
+  document.getElementById('hours').textContent = pad(hours);
+  document.getElementById('mins').textContent  = pad(mins);
+  document.getElementById('secs').textContent  = pad(secs);
+}
+
+// ── SWITCH TO BIRTHDAY ───────────────────────────────────────────────────────
+function switchToBirthday() {
+  document.getElementById('countdown-view').style.display = 'none';
+  document.getElementById('birthday-view').style.display  = 'block';
+  startConfetti();
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────────────────────
+let confettiRunning = false;
+
+function startConfetti() {
+  if (confettiRunning) return;
+  confettiRunning = true;
+
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['#f43f6e','#fda4af','#f59e0b','#34d399','#60a5fa','#a78bfa','#fff','#fef08a'];
+  const PIECES = 160;
+  const pieces = [];
+
+  for (let i = 0; i < PIECES; i++) {
+    pieces.push({
+      x:     Math.random() * window.innerWidth,
+      y:     Math.random() * window.innerHeight - window.innerHeight,
+      r:     Math.random() * 7 + 3,
+      d:     Math.random() * PIECES,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      tilt:  Math.random() * 10 - 10,
+      tiltSpeed: Math.random() * 0.1 + 0.05,
+      speed: Math.random() * 2 + 1.5,
+      shape: Math.random() > .5 ? 'circle' : 'rect',
+      angle: Math.random() * Math.PI * 2,
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.85;
+
+      if (p.shape === 'circle') {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+      }
+      ctx.restore();
+
+      p.y     += p.speed;
+      p.angle += p.tiltSpeed;
+      p.tilt  += p.tiltSpeed;
+      p.x     += Math.sin(p.d / 20);
+
+      if (p.y > canvas.height + 20) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+// ── MUSIC (Web Audio API — no external file needed) ──────────────────────────
+let audioCtx = null;
+let musicPlaying = false;
+
+// Simplified happy birthday melody: note frequencies + durations
+const HB_MELODY = [
+  // "Happy Birthday to You" (public domain)
+  [261.63,.25],[261.63,.25],[293.66,.5],[261.63,.5],[349.23,.5],[329.63,1],
+  [261.63,.25],[261.63,.25],[293.66,.5],[261.63,.5],[392.00,.5],[349.23,1],
+  [261.63,.25],[261.63,.25],[523.25,.5],[440.00,.5],[349.23,.5],[329.63,.5],[293.66,1],
+  [466.16,.25],[466.16,.25],[440.00,.5],[349.23,.5],[392.00,.5],[349.23,1.5],
+];
+
+function playMelody(ctx, when) {
+  const masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(0.18, when);
+  masterGain.connect(ctx.destination);
+
+  let t = when;
+  HB_MELODY.forEach(([freq, dur]) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(1, t + 0.04);
+    gain.gain.setValueAtTime(1, t + dur * 0.7);
+    gain.gain.linearRampToValueAtTime(0, t + dur);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(t);
+    osc.stop(t + dur + 0.05);
+
+    t += dur;
+  });
+
+  return t - when; // total duration
+}
+
+function playMusic() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const btn = document.getElementById('music-btn');
+  if (musicPlaying) {
+    audioCtx.suspend();
+    btn.textContent = '🎵 Play Birthday Song';
+    musicPlaying = false;
+    return;
+  }
+
+  btn.textContent = '🎵 Playing… (tap to pause)';
+  musicPlaying = true;
+
+  function loop() {
+    if (!musicPlaying) return;
+    const dur = playMelody(audioCtx, audioCtx.currentTime);
+    setTimeout(loop, (dur + 0.5) * 1000);
+  }
+  loop();
+}
+
+// ── FLOATING PETALS ──────────────────────────────────────────────────────────
+function createPetals() {
+  const bg     = document.getElementById('petal-bg');
+  const colors = ['#fda4af','#f43f6e','#fecdd3','#fbbf24','#fbcfe8'];
+
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left     = Math.random() * 100 + 'vw';
+    p.style.top      = Math.random() * 100 + 'vh';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width    = (Math.random() * 14 + 8) + 'px';
+    p.style.height   = (Math.random() * 14 + 8) + 'px';
+    p.style.animationDuration  = (Math.random() * 12 + 8) + 's';
+    p.style.animationDelay     = (Math.random() * 10) + 's';
+    bg.appendChild(p);
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+createPetals();
+
+if (isBirthday()) {
+  switchToBirthday();
+} else {
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+}
+</script>
+</body>
+</html>
